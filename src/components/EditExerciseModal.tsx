@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { ExerciseState } from '../types';
 import { X, Minus, Plus } from 'lucide-react';
 
@@ -13,6 +13,15 @@ export const EditExerciseModal = ({ exercise, isOpen, onClose, onSave }: EditExe
   const [weight, setWeight] = useState(exercise.weight);
   const [numSets, setNumSets] = useState(exercise.sets.length);
   const [reps, setReps] = useState(exercise.sets[0]?.targetReps || 5);
+
+  // Sync state when modal opens or exercise changes
+  useEffect(() => {
+    if (isOpen) {
+      setWeight(exercise.weight);
+      setNumSets(exercise.sets.length);
+      setReps(exercise.sets[0]?.targetReps || 5);
+    }
+  }, [isOpen, exercise.id, exercise.weight, exercise.sets.length, exercise.sets[0]?.targetReps]);
 
   if (!isOpen) return null;
 
