@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { HomeScreen } from './components/HomeScreen';
 import { ActiveWorkoutScreen } from './components/ActiveWorkoutScreen';
 import { WorkoutCompleteScreen } from './components/WorkoutCompleteScreen';
@@ -7,9 +7,11 @@ import { useWorkout } from './hooks/useWorkout';
 import type { CompletedWorkout } from './types';
 
 function App() {
+  const navigate = useNavigate();
   const {
     currentWorkout,
     elapsedSeconds,
+    formattedTime,
     startWorkout,
     toggleSetComplete,
     updateExercise,
@@ -22,14 +24,22 @@ function App() {
   };
 
   const handleCompleteWorkout = (): CompletedWorkout | null => {
-    return completeWorkout();
+    return finishWorkout();
   };
+
+  const totalWeight = currentWorkout?.isCompleted
+    ? currentWorkout.exercises.reduce((total: number, ex: { sets: { isCompleted: boolean }[]; weight: number }) => {
+        const completedSets = ex.sets.filter(s => s.isCompleted).length;
+        return total + (completedSets * ex.weight * 5);
+      }, 0)
+    : 0;
 
   const completedWorkout = currentWorkout?.isCompleted
     ? ({
         ...currentWorkout,
+        date: new Date().toISOString(),
         durationSeconds: elapsedSeconds,
-        completedAt: new Date().toISOString(),
+        totalWeight,
       } as CompletedWorkout)
     : null;
 
@@ -52,10 +62,10 @@ function App() {
             currentWorkout ? (
               <ActiveWorkoutScreen
                 workout={currentWorkout}
-                elapsedSeconds={elapsedSeconds}
+                elapsedTime={formattedTime}
                 onToggleSet={toggleSetComplete}
                 onUpdateExercise={updateExercise}
-                onComplete={handleCompleteWorkout}
+                onFinish={handleCompleteWorkout}
                 onCancel={cancelWorkout}
               />
             ) : (
@@ -67,13 +77,13 @@ function App() {
           path="/complete"
           element={
             completedWorkout ? (
-              <WorkoutCompleteScreen workout={completedWorkout} />
+              <WorkoutCompleteScreen workout={completedWorkout} onBack={() => navigate('/')} />
             ) : (
               <Navigate to="/" replace />
             )
           }
         />
-        <Route path="/history" element={<HistoryScreen />} />
+        <Route path="/history" element={<HistoryScreen onBack={() => navigate('/')} />} />
       </Routes>
     </div>
   );

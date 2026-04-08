@@ -35,7 +35,7 @@ export const ActiveWorkoutScreen = ({
 
   const handleSaveExercise = (updates: { weight: number; sets: number; reps: number }) => {
     if (!editingExercise) return;
-    onUpdateExercise(editingExercise.id, updates);
+    onUpdateExercise(editingExercise.id, { weight: updates.weight });
   };
 
   const handleCancel = () => {

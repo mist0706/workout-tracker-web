@@ -5,9 +5,10 @@ import { Check, Trophy, Clock, Dumbbell } from 'lucide-react';
 
 interface WorkoutCompleteScreenProps {
   workout: CompletedWorkout;
+  onBack: () => void;
 }
 
-export const WorkoutCompleteScreen = ({ workout }: WorkoutCompleteScreenProps) => {
+export const WorkoutCompleteScreen = ({ workout, onBack }: WorkoutCompleteScreenProps) => {
   const navigate = useNavigate();
   const [showCheckmark, setShowCheckmark] = useState(false);
 
@@ -27,6 +28,11 @@ export const WorkoutCompleteScreen = ({ workout }: WorkoutCompleteScreenProps) =
   const completedExercises = workout.exercises.filter(ex => 
     ex.sets.some(s => s.isCompleted)
   );
+
+  const handleBack = () => {
+    onBack();
+    navigate('/');
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-success-500 to-success-600 flex flex-col">
@@ -119,7 +125,7 @@ export const WorkoutCompleteScreen = ({ workout }: WorkoutCompleteScreenProps) =
       {/* Footer Button */}
       <div className="p-6 bg-white/10 backdrop-blur-sm">
         <button
-          onClick={() => navigate('/')}
+          onClick={handleBack}
           className="w-full py-4 bg-white text-success-600 font-bold text-lg rounded-2xl shadow-lg hover:bg-gray-50 active:scale-[0.98] transition-all"
         >
           Back to Home
