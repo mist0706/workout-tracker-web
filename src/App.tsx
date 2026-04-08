@@ -3,6 +3,7 @@ import { HomeScreen } from './components/HomeScreen';
 import { ActiveWorkoutScreen } from './components/ActiveWorkoutScreen';
 import { WorkoutCompleteScreen } from './components/WorkoutCompleteScreen';
 import { HistoryScreen } from './components/HistoryScreen';
+import { VersionFooter } from './components/VersionFooter';
 import { useWorkout } from './hooks/useWorkout';
 import type { CompletedWorkout } from './types';
 
@@ -89,6 +90,7 @@ function App() {
         />
         <Route path="/history" element={<HistoryScreen onBack={() => navigate('/')} />} />
       </Routes>
+      <VersionFooter />
     </div>
   );
 }
