@@ -83,3 +83,14 @@ export const createExerciseSets = (numSets: number, targetReps: number): SetStat
 export const generateId = (): string => {
   return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 };
+
+// Last used values for an exercise
+export interface ExerciseDefaults {
+  weight: number;
+  sets: number;
+  reps: number;
+  lastUsed: string; // ISO date
+}
+
+// Per-routine defaults storage
+export type RoutineDefaults = Record<string, ExerciseDefaults>;

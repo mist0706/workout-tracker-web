@@ -47,13 +47,24 @@ export const useWorkout = () => {
     const routine = PPL_ROUTINES.find(r => r.name === routineType);
     if (!routine) return;
 
-    const exercises: ExerciseState[] = routine.exercises.map((ex) => ({
-      id: generateId(),
-      name: ex.name,
-      weight: ex.weight,
-      restSeconds: ex.restSeconds,
-      sets: createExerciseSets(DEFAULT_SETS, DEFAULT_REPS),
-    }));
+    // Load saved defaults for this routine
+    const defaults = storage.getExerciseDefaults(routine.name);
+
+    const exercises: ExerciseState[] = routine.exercises.map((ex) => {
+      // Use saved defaults if available, otherwise use routine defaults
+      const savedDefault = defaults[ex.name];
+      const weight = savedDefault?.weight ?? ex.weight;
+      const sets = savedDefault?.sets ?? DEFAULT_SETS;
+      const reps = savedDefault?.reps ?? DEFAULT_REPS;
+
+      return {
+        id: generateId(),
+        name: ex.name,
+        weight,
+        restSeconds: ex.restSeconds,
+        sets: createExerciseSets(sets, reps),
+      };
+    });
 
     const newWorkout: WorkoutSession = {
       id: generateId(),
@@ -186,6 +197,10 @@ export const useWorkout = () => {
 
     storage.addWorkoutToHistory(completedWorkout);
     storage.updateStreak();
+    
+    // Save defaults for next time
+    storage.saveWorkoutDefaults(currentWorkout.routineName, currentWorkout.exercises);
+    
     storage.clearCurrentWorkout();
 
     const finalWorkout: WorkoutSession = {

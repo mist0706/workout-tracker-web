@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { storage } from '../utils/storage';
 import type { CompletedWorkout } from '../types';
-import { Dumbbell, Clock, ChevronLeft, Calendar, TrendingUp, Trash2 } from 'lucide-react';
+import { WorkoutStatsChart } from './WorkoutStatsChart';
+import { Dumbbell, Clock, ChevronLeft, Calendar, TrendingUp, Trash2, BarChart3 } from 'lucide-react';
 
 export const HistoryScreen = ({ onBack }: { onBack: () => void }) => {
   const [workouts, setWorkouts] = useState<CompletedWorkout[]>([]);
@@ -97,6 +98,17 @@ export const HistoryScreen = ({ onBack }: { onBack: () => void }) => {
             </div>
           </div>
         </div>
+
+        {/* Chart Section */}
+        {workouts.length > 0 && (
+          <div className="mt-4 bg-white rounded-2xl p-4 shadow-sm">
+            <div className="flex items-center gap-2 mb-4">
+              <BarChart3 className="w-5 h-5 text-gray-600" />
+              <span className="font-semibold text-gray-900">Progress Charts</span>
+            </div>
+            <WorkoutStatsChart workouts={workouts} type="volume" />
+          </div>
+        )}
       </div>
 
       {/* Workout List */}

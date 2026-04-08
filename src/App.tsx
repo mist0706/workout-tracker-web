@@ -1,7 +1,9 @@
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { HomeScreen } from './components/HomeScreen';
 import { ActiveWorkoutScreen } from './components/ActiveWorkoutScreen';
 import { WorkoutCompleteScreen } from './components/WorkoutCompleteScreen';
+import { WorkoutSummaryModal } from './components/WorkoutSummaryModal';
 import { HistoryScreen } from './components/HistoryScreen';
 import { VersionFooter } from './components/VersionFooter';
 import { useWorkout } from './hooks/useWorkout';
@@ -9,6 +11,9 @@ import type { CompletedWorkout } from './types';
 
 function App() {
   const navigate = useNavigate();
+  const [showSummaryModal, setShowSummaryModal] = useState(false);
+  const [lastCompletedWorkout, setLastCompletedWorkout] = useState<CompletedWorkout | null>(null);
+  
   const {
     currentWorkout,
     elapsedSeconds,
@@ -24,10 +29,22 @@ function App() {
 
   const handleStartWorkout = (routine: 'Push' | 'Pull' | 'Legs') => {
     startWorkout(routine);
+    setLastCompletedWorkout(null);
   };
 
   const handleCompleteWorkout = (): CompletedWorkout | null => {
-    return finishWorkout();
+    const completed = finishWorkout();
+    if (completed) {
+      setLastCompletedWorkout(completed);
+      setShowSummaryModal(true);
+    }
+    return completed;
+  };
+
+  const handleCloseSummary = () => {
+    setShowSummaryModal(false);
+    setLastCompletedWorkout(null);
+    navigate('/');
   };
 
   const totalWeight = currentWorkout?.isCompleted
@@ -90,6 +107,17 @@ function App() {
         />
         <Route path="/history" element={<HistoryScreen onBack={() => navigate('/')} />} />
       </Routes>
+      
+      {/* Workout Summary Modal - shows on finish */}
+      {lastCompletedWorkout && (
+        <WorkoutSummaryModal
+          workout={lastCompletedWorkout}
+          isOpen={showSummaryModal}
+          onClose={handleCloseSummary}
+          onViewHistory={() => navigate('/history')}
+        />
+      )}
+      
       <VersionFooter />
     </div>
   );
