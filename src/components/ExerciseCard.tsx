@@ -1,5 +1,5 @@
 import type { ExerciseState } from '../types';
-import { Check } from 'lucide-react';
+import { Check, ChevronRight } from 'lucide-react';
 
 interface ExerciseCardProps {
   exercise: ExerciseState;
@@ -24,9 +24,7 @@ export const ExerciseCard = ({ exercise, onToggleSet, onEdit }: ExerciseCardProp
           </p>
         </div>
         <div className="text-right">
-          <span className="text-primary-600 font-semibold text-lg">
-            {completedSets}/{exercise.sets.length}
-          </span>
+          <ChevronRight className="w-6 h-6 text-gray-400" />
         </div>
       </div>
 

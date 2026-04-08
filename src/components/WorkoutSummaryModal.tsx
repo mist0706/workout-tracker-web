@@ -120,10 +120,10 @@ export const WorkoutSummaryModal = ({
             onClick={onClose}
             className="w-full py-3 bg-success-500 hover:bg-success-600 text-white font-semibold rounded-xl transition-colors"
           >
-            Start Another Workout
+            Continue
           </button>
           <button
-            onClick={onViewHistory}
+            onClick={() => { onClose(); onViewHistory(); }}
             className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition-colors"
           >
             View History

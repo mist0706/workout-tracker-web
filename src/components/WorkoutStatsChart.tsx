@@ -8,7 +8,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { Bar } from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2';
 import type { CompletedWorkout } from '../types';
 
 ChartJS.register(
@@ -127,7 +127,7 @@ export const WorkoutStatsChart = ({ workouts, type = 'volume' }: WorkoutStatsCha
 
   return (
     <div className="h-64">
-      <Bar data={chartData} options={options} />
+      <Line data={chartData} options={options} />
     </div>
   );
 };

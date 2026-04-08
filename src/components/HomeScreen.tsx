@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { storage } from '../utils/storage';
-import { Flame, BarChart3, ChevronRight, Dumbbell } from 'lucide-react';
+import { Flame, BarChart3, ChevronRight, Dumbbell, History } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export const HomeScreen = ({ onStartWorkout }: { onStartWorkout: (type: 'Push' | 'Pull' | 'Legs') => void }) => {
@@ -56,9 +56,17 @@ export const HomeScreen = ({ onStartWorkout }: { onStartWorkout: (type: 'Push' |
     <div className="min-h-screen bg-gray-50 pb-24">
       {/* Header */}
       <div className="bg-primary-600 pt-safe-top pb-8">
-        <div className="px-5 pt-12 pb-4">
-          <h1 className="text-2xl font-bold text-white">Workout Tracker</h1>
-          <p className="text-primary-100 mt-1">Let's crush your goals today</p>
+        <div className="px-5 pt-12 pb-4 flex justify-between items-start">
+          <div>
+            <h1 className="text-2xl font-bold text-white">Workout Tracker</h1>
+            <p className="text-primary-100 mt-1">Let's crush your goals today</p>
+          </div>
+          <button
+            onClick={() => navigate('/history')}
+            className="p-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors"
+          >
+            <History className="w-6 h-6 text-white" />
+          </button>
         </div>
 
         {/* Stats Cards */}
