@@ -33,9 +33,9 @@ export const ExerciseCard = ({ exercise, onToggleSet, onEdit }: ExerciseCardProp
       {/* Sets */}
       <div className="px-5 pb-5">
         <div className="flex flex-wrap gap-3">
-          {exercise.sets.map((set) => (
+          {exercise.sets.map((set, index) => (
             <button
-              key={set.setNumber}
+              key={index}
               onClick={(e) => {
                 e.stopPropagation();
                 onToggleSet(set.setNumber);
@@ -45,7 +45,7 @@ export const ExerciseCard = ({ exercise, onToggleSet, onEdit }: ExerciseCardProp
                 transition-all duration-200 active:scale-95
                 ${set.isCompleted 
                   ? 'bg-success-500 text-white shadow-md' 
-                  : 'bg-white border-2 border-gray-300 text-gray-400 hover:border-gray-400'}
+                  : 'bg-white border-2 border-gray-300 text-gray-600 hover:border-gray-400'}
               `}
             >
               {set.isCompleted ? (

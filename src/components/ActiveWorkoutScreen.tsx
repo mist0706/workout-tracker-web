@@ -1,31 +1,92 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { WorkoutSession } from '../types';
 import { ExerciseCard } from './ExerciseCard';
 import { EditExerciseModal } from './EditExerciseModal';
+import { SkipForward } from 'lucide-react';
 
 interface ActiveWorkoutScreenProps {
   workout: WorkoutSession;
   elapsedTime: string;
   onToggleSet: (exerciseId: string, setNumber: number) => void;
-  onUpdateExercise: (exerciseId: string, updates: Partial<ExerciseState> & { sets?: number; reps?: number }) => void;
+  onUpdateExercise: (exerciseId: string, updates: Partial<ExerciseState>) => void;
+  onUpdateSets: (exerciseId: string, numSets: number) => void;
+  onUpdateReps: (exerciseId: string, reps: number) => void;
   onFinish: () => void;
   onCancel: () => void;
 }
 
 type ExerciseState = import('../types').ExerciseState;
 
+interface RestTimer {
+  exerciseId: string;
+  secondsRemaining: number;
+  totalSeconds: number;
+}
+
 export const ActiveWorkoutScreen = ({
   workout,
   elapsedTime,
   onToggleSet,
   onUpdateExercise,
+  onUpdateSets,
+  onUpdateReps,
   onFinish,
   onCancel,
 }: ActiveWorkoutScreenProps) => {
   const navigate = useNavigate();
   const [editingExercise, setEditingExercise] = useState<ExerciseState | null>(null);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [restTimer, setRestTimer] = useState<RestTimer | null>(null);
+
+  // Format rest time as M:SS
+  const formatRestTime = useCallback((seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  }, []);
+
+  // Handle set toggle with rest timer
+  const handleToggleSet = useCallback((exerciseId: string, setNumber: number, restSeconds: number) => {
+    // Call original toggle
+    onToggleSet(exerciseId, setNumber);
+
+    // Find exercise and check if we're completing (not un-completing)
+    const exercise = workout.exercises.find(ex => ex.id === exerciseId);
+    if (!exercise) return;
+
+    const set = exercise.sets.find(s => s.setNumber === setNumber);
+    // Only start timer if we're marking as complete (not if we're un-completing)
+    if (set && !set.isCompleted && restSeconds > 0) {
+      setRestTimer({
+        exerciseId,
+        secondsRemaining: restSeconds,
+        totalSeconds: restSeconds,
+      });
+    }
+  }, [onToggleSet, workout.exercises]);
+
+  // Skip rest timer
+  const skipRest = useCallback(() => {
+    setRestTimer(null);
+  }, []);
+
+  // Rest timer countdown effect
+  useEffect(() => {
+    if (!restTimer) return;
+
+    const interval = setInterval(() => {
+      setRestTimer(prev => {
+        if (!prev) return null;
+        if (prev.secondsRemaining <= 1) {
+          return null;
+        }
+        return { ...prev, secondsRemaining: prev.secondsRemaining - 1 };
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [restTimer?.exerciseId]);
 
   const completedSets = workout.exercises.reduce((total, ex) => 
     total + ex.sets.filter(s => s.isCompleted).length, 0
@@ -35,7 +96,12 @@ export const ActiveWorkoutScreen = ({
 
   const handleSaveExercise = (updates: { weight: number; sets: number; reps: number }) => {
     if (!editingExercise) return;
+    // Update weight
     onUpdateExercise(editingExercise.id, { weight: updates.weight });
+    // Update number of sets
+    onUpdateSets(editingExercise.id, updates.sets);
+    // Update reps for all sets
+    onUpdateReps(editingExercise.id, updates.reps);
   };
 
   const handleCancel = () => {
@@ -49,11 +115,32 @@ export const ActiveWorkoutScreen = ({
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Rest Timer Banner */}
+      {restTimer && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-primary-500 text-white shadow-lg animate-pulse">
+          <div className="px-5 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="text-lg font-semibold">Rest:</span>
+              <span className="text-2xl font-mono font-bold">
+                {formatRestTime(restTimer.secondsRemaining)}
+              </span>
+            </div>
+            <button
+              onClick={skipRest}
+              className="flex items-center gap-2 px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-medium transition-colors"
+            >
+              <SkipForward className="w-4 h-4" />
+              Skip Rest
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
-      <div className="bg-white shadow-sm sticky top-0 z-10">
+      <div className={`bg-white shadow-sm sticky z-10 ${restTimer ? 'top-[60px]' : 'top-0'}`}>
         <div className="px-5 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <button 
+            <button
               onClick={handleCancel}
               className="text-gray-500 hover:text-gray-700 text-sm font-medium"
             >
@@ -72,8 +159,8 @@ export const ActiveWorkoutScreen = ({
             disabled={completedSets === 0}
             className={`
               px-5 py-2 rounded-xl font-semibold text-sm transition-colors
-              ${completedSets > 0 
-                ? 'bg-success-500 text-white hover:bg-success-600' 
+              ${completedSets > 0
+                ? 'bg-success-500 text-white hover:bg-success-600'
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'}
             `}
           >
@@ -98,12 +185,12 @@ export const ActiveWorkoutScreen = ({
       </div>
 
       {/* Exercise Cards */}
-      <div className="px-5 py-4 space-y-4">
+      <div className={`px-5 py-4 space-y-4 ${restTimer ? 'pt-[76px]' : ''}`}>
         {workout.exercises.map((exercise) => (
           <ExerciseCard
             key={exercise.id}
             exercise={exercise}
-            onToggleSet={(setNumber) => onToggleSet(exercise.id, setNumber)}
+            onToggleSet={(setNumber) => handleToggleSet(exercise.id, setNumber, exercise.restSeconds)}
             onEdit={() => setEditingExercise(exercise)}
           />
         ))}

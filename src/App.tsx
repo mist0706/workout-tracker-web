@@ -15,6 +15,8 @@ function App() {
     startWorkout,
     toggleSetComplete,
     updateExercise,
+    updateExerciseSets,
+    updateExerciseReps,
     finishWorkout,
     cancelWorkout,
   } = useWorkout();
@@ -65,6 +67,8 @@ function App() {
                 elapsedTime={formattedTime}
                 onToggleSet={toggleSetComplete}
                 onUpdateExercise={updateExercise}
+                onUpdateSets={updateExerciseSets}
+                onUpdateReps={updateExerciseReps}
                 onFinish={handleCompleteWorkout}
                 onCancel={cancelWorkout}
               />

@@ -146,6 +146,27 @@ export const useWorkout = () => {
     });
   }, []);
 
+  const updateExerciseReps = useCallback((exerciseId: string, reps: number) => {
+    setCurrentWorkout(prev => {
+      if (!prev) return prev;
+
+      const updated: WorkoutSession = {
+        ...prev,
+        exercises: prev.exercises.map(ex => {
+          if (ex.id !== exerciseId) return ex;
+
+          return {
+            ...ex,
+            sets: ex.sets.map(set => ({ ...set, targetReps: reps })),
+          };
+        }),
+      };
+
+      storage.saveCurrentWorkout(updated);
+      return updated;
+    });
+  }, []);
+
   const finishWorkout = useCallback((): CompletedWorkout | null => {
     if (!currentWorkout) return null;
 
@@ -218,6 +239,7 @@ export const useWorkout = () => {
     toggleSetComplete,
     updateExercise,
     updateExerciseSets,
+    updateExerciseReps,
     finishWorkout,
     cancelWorkout,
   };

@@ -1,9 +1,9 @@
 version: '3.8'
 
 services:
-  workout-web:
+  workout-tracker-web:
     build: .
     ports:
-      - "3000:80"
-    container_name: workout-tracker-web
+      - "3010:80"
+    container_name: workout-tracker-web-new
     restart: unless-stopped
