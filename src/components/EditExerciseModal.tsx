@@ -68,9 +68,16 @@ export const EditExerciseModal = ({ exercise, isOpen, onClose, onSave }: EditExe
               >
                 <Minus className="w-6 h-6 text-gray-600" />
               </button>
-              <div className="text-4xl font-bold text-gray-900 min-w-[120px] text-center">
-                {weight}
-              </div>
+              <input
+                type="number"
+                inputMode="decimal"
+                value={weight}
+                onChange={(e) => setWeight(Math.max(0, parseFloat(e.target.value) || 0))}
+                onClick={(e) => (e.target as HTMLInputElement).select()}
+                min="0"
+                step="0.5"
+                className="text-4xl font-bold text-gray-900 min-w-[120px] text-center bg-transparent border-b-2 border-transparent focus:border-primary-500 focus:outline-none transition-colors"
+              />
               <button
                 onClick={() => setWeight(w => w + 2.5)}
                 className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center active:bg-gray-200 transition-colors"
@@ -90,9 +97,16 @@ export const EditExerciseModal = ({ exercise, isOpen, onClose, onSave }: EditExe
               >
                 <Minus className="w-6 h-6 text-gray-600" />
               </button>
-              <div className="text-4xl font-bold text-gray-900 min-w-[80px] text-center">
-                {numSets}
-              </div>
+              <input
+                type="number"
+                inputMode="numeric"
+                value={numSets}
+                onChange={(e) => setNumSets(Math.max(1, Math.min(10, parseInt(e.target.value) || 1)))}
+                onClick={(e) => (e.target as HTMLInputElement).select()}
+                min="1"
+                max="10"
+                className="text-4xl font-bold text-gray-900 min-w-[80px] text-center bg-transparent border-b-2 border-transparent focus:border-primary-500 focus:outline-none transition-colors"
+              />
               <button
                 onClick={() => setNumSets(s => Math.min(10, s + 1))}
                 className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center active:bg-gray-200 transition-colors"
@@ -112,9 +126,16 @@ export const EditExerciseModal = ({ exercise, isOpen, onClose, onSave }: EditExe
               >
                 <Minus className="w-6 h-6 text-gray-600" />
               </button>
-              <div className="text-4xl font-bold text-gray-900 min-w-[80px] text-center">
-                {reps}
-              </div>
+              <input
+                type="number"
+                inputMode="numeric"
+                value={reps}
+                onChange={(e) => setReps(Math.max(1, Math.min(20, parseInt(e.target.value) || 1)))}
+                onClick={(e) => (e.target as HTMLInputElement).select()}
+                min="1"
+                max="20"
+                className="text-4xl font-bold text-gray-900 min-w-[80px] text-center bg-transparent border-b-2 border-transparent focus:border-primary-500 focus:outline-none transition-colors"
+              />
               <button
                 onClick={() => setReps(r => Math.min(20, r + 1))}
                 className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center active:bg-gray-200 transition-colors"
