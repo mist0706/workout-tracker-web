@@ -3,6 +3,8 @@ import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
+  PointElement,  // Added for line charts
+  LineElement,   // Added for line charts
   BarElement,
   Title,
   Tooltip,
@@ -14,6 +16,8 @@ import type { CompletedWorkout } from '../types';
 ChartJS.register(
   CategoryScale,
   LinearScale,
+  PointElement,  // Register point
+  LineElement,   // Register line
   BarElement,
   Title,
   Tooltip,
