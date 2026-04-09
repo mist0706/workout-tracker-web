@@ -48,16 +48,19 @@ export const ActiveWorkoutScreen = ({
 
   // Handle set toggle with rest timer
   const handleToggleSet = useCallback((exerciseId: string, setNumber: number, restSeconds: number) => {
+    // Find exercise to check current state BEFORE toggle
+    const exercise = workout.exercises.find(ex => ex.id === exerciseId);
+    const set = exercise?.sets.find(s => s.setNumber === setNumber);
+    
+    // Start timer if this set is currently NOT completed (about to be completed)
+    // and has rest time configured
+    const shouldStartTimer = set && !set.isCompleted && restSeconds > 0;
+    
     // Call original toggle
     onToggleSet(exerciseId, setNumber);
-
-    // Find exercise and check if we're completing (not un-completing)
-    const exercise = workout.exercises.find(ex => ex.id === exerciseId);
-    if (!exercise) return;
-
-    const set = exercise.sets.find(s => s.setNumber === setNumber);
-    // Only start timer if we're marking as complete (not if we're un-completing)
-    if (set && !set.isCompleted && restSeconds > 0) {
+    
+    // Start rest timer when completing a set
+    if (shouldStartTimer) {
       setRestTimer({
         exerciseId,
         secondsRemaining: restSeconds,
